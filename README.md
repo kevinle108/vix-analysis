@@ -1,5 +1,4 @@
 # vix-analysis
-Note: README under construction..
 
 Question explored:
   How well does VIX (market volatility index) predict total stock index performance the next day?
@@ -14,3 +13,9 @@ Requirement features:
     - Visualize data in a graph, chart, or other visual representation of data.
   - [ ] Category 4: Best Practices:
     - The program should utilize a virtual environment and document library dependencies in a requirements.txt file.
+
+To-Dos:
+  - write better README following requirements guidelines
+  - combine historical data (csv) and recent data (api) together in one
+  - virtual enviroment and packages
+  - possible additional features: add master loop with ticker selection by user & jupyter notebook
