@@ -19,4 +19,4 @@ To-Dos:
   - write better README following requirements guidelines
   - combine historical data (csv) and recent data (api) together in one
   - virtual enviroment and packages
-  - possible additional features: add master loop with ticker selection by user & jupyter notebook
+  - possible additional features: add master loop with ticker selection by user, jupyter notebook, or flask site
