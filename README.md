@@ -15,6 +15,7 @@ Requirement features:
     - The program should utilize a virtual environment and document library dependencies in a requirements.txt file.
 
 To-Dos:
+  - comment code
   - write better README following requirements guidelines
   - combine historical data (csv) and recent data (api) together in one
   - virtual enviroment and packages
