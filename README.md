@@ -8,5 +8,5 @@ Requirement features:
     - Connect to an external/3rd party API and read data into your app
   - [x] Category 3: Data Display:
     - Visualize data in a graph, chart, or other visual representation of data.
-  - [] Category 4: Best Practices:
+  - [ ] Category 4: Best Practices:
     - The program should utilize a virtual environment and document library dependencies in a requirements.txt file.
