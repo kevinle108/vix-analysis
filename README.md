@@ -1,4 +1,8 @@
 # vix-analysis
+Note: README under construction..
+
+Question explored:
+  How well does VIX (market volatility index) predict total stock index performance the next day?
 
 Requirement features:
   - [x] Category 1: Python Programming Basics: 
