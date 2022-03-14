@@ -1,4 +1,4 @@
-# vix-analysis
+# VIX Analysis
 
 Question explored:
   How well does VIX (market volatility index) predict total stock index performance the next day?
