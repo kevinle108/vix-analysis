@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 symbols = ['^VIX', 'FSKAX']
 tickers = yf.Tickers(symbols)
-df = tickers.download(group_by='ticker', start='2022-01-01', end='2022-03-11')
+df = tickers.download(group_by='ticker', start='2022-01-01')
 
 vix = df['^VIX']
 vix_close = vix['Close'].to_list()
