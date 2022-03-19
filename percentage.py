@@ -8,14 +8,10 @@ import matplotlib.pyplot as plt
 # fskax = yf.Ticker('FSKAX')
 # vix = yf.Ticker('^VIX')
 
-# print('\nVIX')
-# print(vix.history())
-
 symbols = ['^VIX', 'FSKAX']
 tickers = yf.Tickers(symbols)
 df = tickers.download(group_by='ticker', start='2022-01-01', end='2022-03-11')
 
-# vix['Close'].plot(label = 'VIX (fear)')
 vix = df['^VIX']
 vix_close = vix['Close'].to_list()
 vix_trend = []
@@ -48,11 +44,12 @@ for cur in fskax_close:
 
 dates = df.index[1:]
 
-plt.plot(
-  dates, vix_trend,
-  dates, fskax_trend,
-)
-
+plt.plot(dates, vix_trend, label='VIX')
+plt.plot(dates, fskax_trend, label='FSKAX')
+plt.title('VIX vs FSKAX performance')
+plt.xlabel('Date')
+plt.ylabel('% Gain / Loss From Previous Day')
+plt.legend(loc="upper right")
 plt.show()
 
 
