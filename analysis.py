@@ -24,7 +24,8 @@ def calculate_gain_loss(ticker_close_list):
   return gain_loss
 
 def show_historical():
-  vix = pandas.read_csv('data/raw/vix_daily_2012_2022.csv')
+  vix_file_path = 'data/raw/vix_daily_2012_2022.csv'
+  vix = pandas.read_csv(vix_file_path)
   # print('VIX (fear index):\n\tmax single-day value:', vix.Close.max())
   # print('\tmin single-day value:', vix.Close.min())
 
@@ -63,7 +64,34 @@ def show_historical():
   # plt.plot(vix['Close'], label = 'VIX')
   # plt.plot(vtsax['Close'], label = 'VTSAX')
 
-  plt.show()
+  # plt.show()
+
+  vix_close = vix['Close'].to_list()
+  vix_close = convert_values_to_float(vix_close)
+  vix_trend = calculate_gain_loss(vix_close)
+  print('historical vix length', len(vix_trend))
+  
+  vtsax_close = convert_values_to_float(vtsax['Close'].to_list())
+  vtsax_trend = calculate_gain_loss(vtsax_close)
+  print('historical fskax length', len(vtsax_close))
+
+  yes = 0
+  no = 0
+  for vix,vtsax in zip(vix_trend, vtsax_trend):
+    if (np.sign(vix) != np.sign(vtsax)):
+      yes += 1
+      print(vix, vtsax, 'yes')
+    else:
+      no += 1
+      print(vix, vtsax, 'no')
+  
+  print(f'length of lists: {len(vix_trend)}')
+  print(f'yes: {yes}')
+  print(f'no: {no}')
+  print(f'sum of yes & no: {yes + no}')
+  print(f'yes percentage: {round(yes / len(vix_trend) * 100, 2)}%')
+  
+
 
   # data visualizations: https://www.analyticsvidhya.com/blog/2021/07/stock-prices-analysis-with-python/
   # Check out dataframe.corr() method for correlations
