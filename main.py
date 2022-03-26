@@ -5,7 +5,8 @@ def main():
     '1' : 'View Historical Trends of VIX and Total Market',
     '2' : 'View Recent Gain/Loss w/ VIX',
     '3' : 'View Recent Gain/Loss w/ VIX inverse',
-    '4' : 'Exit Program'
+    '4' : 'Exit Program',
+    't' : 'historical gain-loss'
   }
   
   while True:
@@ -17,9 +18,11 @@ def main():
       if selection == '1':
         analysis.show_historical()
       elif selection == '2':
-        analysis.show_recent(False)
+        analysis.show_recent(use_inverse = False)
       elif selection == '3':
-        analysis.show_recent(True)
+        analysis.show_recent(use_inverse = True)
+      elif selection == 't':
+        analysis.historical_gain_loss()
       else: break 
     else:
       print('Invalid Selection!')
