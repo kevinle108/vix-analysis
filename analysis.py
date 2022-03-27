@@ -1,5 +1,6 @@
 from cProfile import label
 from turtle import color
+from matplotlib import dates
 from numpy import diff
 import pandas as pandas
 import numpy as np
@@ -24,77 +25,92 @@ def calculate_gain_loss(ticker_close_list):
   return gain_loss
 
 def show_historical():
-  vix_file_path = 'data/raw/vix_daily_2012_2022.csv'
-  vix = pandas.read_csv(vix_file_path)
-  # print('VIX (fear index):\n\tmax single-day value:', vix.Close.max())
-  # print('\tmin single-day value:', vix.Close.min())
+  FOLDER_PATH = 'data/historical/'
+  VIX_FILE_NAME = '^VIX.csv'
+  TICKER_FILE_NAME= 'VFIAX.csv'
+  LAST_PRECOVID_DATE = '2019-12-31'
+  ticker_name = TICKER_FILE_NAME.strip('.csv')
 
-  # vti = pandas.read_csv('data/raw/vti_daily_2012_2022.csv')
-  # print('\nVTI:\n\tmax single-day value:', vti.Close.max())
-  # print('\tmin single-day value:', vti.Close.min())
+  vix = pandas.read_csv(FOLDER_PATH + VIX_FILE_NAME)
+  ticker = pandas.read_csv(FOLDER_PATH + TICKER_FILE_NAME)
 
-  # vtsax = pandas.read_csv('data/raw/vtsax_daily_2012_2022.csv')
-  # print('\nvtsax:\n\tmax single-day value:', vtsax.Close.max())
-  # print('\tmin single-day value:', vtsax.Close.min())
-
-  vtsax = pandas.read_csv('data/raw/vtsax_daily_2012_2022.csv')
-  # print('\nVTSAX:\n\tmax single-day value:', vtsax.Close.max())
-  # print('\tmin single-day value:', vtsax.Close.min())
-
+  # convert Date column values to datetime64
   vix['Date'] = pandas.to_datetime(vix['Date'], format = '%Y-%m-%d')
   vix.set_index(['Date'], inplace=True)
-  vix['Close'].plot(label = 'VIX (fear)')
 
-  # vti['Date'] = pandas.to_datetime(vti['Date'], format = '%Y-%m-%d')
-  # vti.set_index(['Date'], inplace=True)
-  # vti['Close'].plot(label = 'VTI')
+  ticker['Date'] = pandas.to_datetime(ticker['Date'], format = '%Y-%m-%d')
+  ticker.set_index(['Date'], inplace=True)
 
-  # vtsax['Date'] = pandas.to_datetime(vtsax['Date'], format = '%Y-%m-%d')
-  # vtsax.set_index(['Date'], inplace=True)
-  # vtsax['Close'].plot(label = 'VTSAX')
+  
 
-  vtsax['Date'] = pandas.to_datetime(vtsax['Date'], format = '%Y-%m-%d')
-  vtsax.set_index(['Date'], inplace=True)
-  vtsax['Close'].plot(label = 'VTSAX')
+  # filter rows so that both vix and ticker share the same start and end date
+  common_start_date = ticker.index[0].date()
+  filtered_vix = vix.query(f"Date >= '{common_start_date}' and Date <= '{LAST_PRECOVID_DATE}'")
+  filtered_ticker = ticker.query(f"Date >= '{common_start_date}' and Date <= '{LAST_PRECOVID_DATE}'")
+  print(filtered_vix)
 
-  plt.title('Historical Market Trends \n(Start of 2012 to End of 2021)')
+  # plot data with matplotlib                            
+  filtered_vix['Close'].plot(label = '^VIX (Market Volatility)')
+  filtered_ticker['Close'].plot(label = TICKER_FILE_NAME.strip('.csv'))
+  plt.title(f'Historical Trends, Pre-COVID\nFrom {common_start_date} to {LAST_PRECOVID_DATE}')
   plt.xlabel('Date')
   plt.ylabel('Index')
-  plt.legend(loc="upper left")
-  # plt.plot(vix['Close'], label = 'VIX')
-  # plt.plot(vtsax['Close'], label = 'VTSAX')
+  plt.legend(loc="upper right")
 
-  # plt.show()
+  plt.show()
 
-  vix_close = vix['Close'].to_list()
-  vix_close = convert_values_to_float(vix_close)
-  vix_trend = calculate_gain_loss(vix_close)
-  print('historical vix length', len(vix_trend))
-  
-  vtsax_close = convert_values_to_float(vtsax['Close'].to_list())
-  vtsax_trend = calculate_gain_loss(vtsax_close)
-  print('historical fskax length', len(vtsax_close))
-
-  yes = 0
-  no = 0
-  for vix,vtsax in zip(vix_trend, vtsax_trend):
-    if (np.sign(vix) != np.sign(vtsax)):
-      yes += 1
-      print(vix, vtsax, 'yes')
-    else:
-      no += 1
-      print(vix, vtsax, 'no')
-  
-  print(f'length of lists: {len(vix_trend)}')
-  print(f'yes: {yes}')
-  print(f'no: {no}')
-  print(f'sum of yes & no: {yes + no}')
-  print(f'yes percentage: {round(yes / len(vix_trend) * 100, 2)}%')
-  
+  show_gain_loss(filtered_vix, filtered_ticker, ticker_name)
 
 
   # data visualizations: https://www.analyticsvidhya.com/blog/2021/07/stock-prices-analysis-with-python/
   # Check out dataframe.corr() method for correlations
+
+def show_gain_loss(vix, ticker, ticker_name):
+  dates = vix.index[1:]
+  vix_close = convert_values_to_float(vix['Close'].to_list())
+  vix_trend = calculate_gain_loss(vix_close)
+  ticker_close = convert_values_to_float(ticker['Close'].to_list())
+  ticker_trend = calculate_gain_loss(ticker_close)
+
+  yes = 0
+  no = 0
+  for vix,ticker in zip(vix_trend, ticker_trend):
+    if (np.sign(vix) != np.sign(ticker)):
+      yes += 1
+      print(vix, ticker, 'yes')
+    else:
+      no += 1
+      print(vix, ticker, 'no')
+
+
+
+  # result = {}
+  # # save analysis in a result dict
+  # for i, date in enumerate(dates):
+  #   result[date.strftime('%m/%d/%Y')] = {
+  #     '^VIX': vix_trend[i],
+  #     ticker_name: ticker_trend[i]
+  #   }
+  # print(result)
+
+  print(f'length of lists:')
+  print(len(dates))
+  print(len(vix_trend))
+  print(len(ticker_trend))
+  print(f'yes: {yes}')
+  print(f'no: {no}')
+  print(f'sum of yes & no: {yes + no}')
+  print(f'yes percentage: {round(yes / len(vix_trend) * 100, 2)}%')
+
+  # plt.plot(dates, vix_trend, label='VIX')
+  # plt.plot(dates, ticker_trend, label='Ticker')
+  # plt.axhline(0, color='black')
+  # plt.title('VIX vs VTSAX performance')
+  # plt.xlabel('Date')
+  # plt.ylabel('% Gain / Loss From Previous Day')
+  # plt.legend(loc="upper right")
+  # plt.show()
+  
 
 def show_recent(use_inverse):
   # plots percentage gain and loss
@@ -104,12 +120,10 @@ def show_recent(use_inverse):
 
   symbols = ['^VIX', 'VTSAX']
   tickers = yf.Tickers(symbols)
-  df = tickers.download(group_by='ticker', start='2022-01-01')
+  df = tickers.download(group_by='ticker', start='2020-01-01')
 
   vix = df['^VIX']
   vix_close = vix['Close'].to_list()
-  vix_trend = []
-  print('vix_close raw:', vix_close)
 
   vtsax = df['VTSAX']
   vtsax_close = vtsax['Close'].to_list()
@@ -132,15 +146,31 @@ def show_recent(use_inverse):
   #   else:
   #     vix_trend.append(gl_percent)
 
-  vtsax_trend = calculate_gain_loss(vtsax_close)
+  ticker_trend = calculate_gain_loss(vtsax_close)
+
+  yes = 0
+  no = 0
+  for vix,ticker in zip(vix_trend, ticker_trend):
+    if (np.sign(vix) != np.sign(ticker)):
+      yes += 1
+      print(vix, ticker, 'yes')
+    else:
+      no += 1
+      print(vix, ticker, 'no')
 
   dates = df.index[1:]
+  print(f'length of lists:')
+  print(len(dates))
+  print(len(vix_trend))
+  print(len(ticker_trend))
+  print(f'yes: {yes}')
+  print(f'no: {no}')
+  print(f'sum of yes & no: {yes + no}')
+  print(f'yes percentage: {round(yes / len(vix_trend) * 100, 2)}%')
 
   plt.plot(dates, vix_trend, label='VIX')
-  plt.plot(dates, vtsax_trend, label='VTSAX')
+  plt.plot(dates, ticker_trend, label='VTSAX')
   plt.axhline(0, color='black')
-  print('vix', vix_trend)
-  print('VTSAX', vtsax_trend)
 
   # x_day = []
   # day = 0
