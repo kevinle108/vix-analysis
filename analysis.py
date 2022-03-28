@@ -43,8 +43,6 @@ def show_historical():
   ticker['Date'] = pandas.to_datetime(ticker['Date'], format = '%Y-%m-%d')
   ticker.set_index(['Date'], inplace=True)
 
-  
-
   # filter rows so that both vix and ticker share the same start and end date
   common_start_date = ticker.index[0].date()
   filtered_vix = vix.query(f"Date >= '{common_start_date}' and Date <= '{LAST_PRECOVID_DATE}'")
@@ -140,108 +138,43 @@ def show_gain_loss(vix, ticker, ticker_name):
   # plt.ylabel('% Gain / Loss From Previous Day')
   # plt.legend(loc="upper right")
   # plt.show()
-  
 
-def show_recent(use_inverse):
+def show_recent(use_inverse, show_analysis):
   # plots percentage gain and loss
 
   # ticker = yf.Ticker('VTSAX')
   # vix = yf.Ticker('^VIX')
 
-  symbols = ['^VIX', 'VTSAX']
+  symbols = ['^VIX', 'VFIAX']
   tickers = yf.Tickers(symbols)
   df = tickers.download(group_by='ticker', start='2022-01-01')
 
   vix = df['^VIX']
   vix_close = vix['Close'].to_list()
 
-  ticker = df['VTSAX']
+  ticker = df['VFIAX']
   ticker_close = ticker['Close'].to_list()
 
-  vix_close = convert_values_to_float(vix_close)
-  vix_trend = calculate_gain_loss(vix_close)
-  if use_inverse is True:
-    vix_trend = [value * -1 for value in vix_trend]
-  # prev = -1.0
-  # for cur in vix_close:
-  #   # set up first values
-  #   if prev == -1.0:
-  #     prev = float(cur)
-  #     continue
-  #   gain_loss = float(cur) - prev
-  #   gl_percent = gain_loss / float(cur) * 100
-  #   prev = float(cur)
-  #   if use_inverse == True:
-  #     vix_trend.append(gl_percent * -1)
-  #   else:
-  #     vix_trend.append(gl_percent)
+  if show_analysis == True:
+    show_gain_loss(vix, ticker, 'VFIAX')
 
+  vix_trend = calculate_gain_loss(vix_close)
   ticker_trend = calculate_gain_loss(ticker_close)
 
-  yes = 0
-  no = 0
-  for vix,ticker in zip(vix_trend, ticker_trend):
-    if (np.sign(vix) != np.sign(ticker)):
-      yes += 1
-      print(f'vix: {vix}', ticker, 'yes')
-    else:
-      no += 1
-      print(vix, ticker, 'no')
+  if use_inverse is True:
+    vix_trend = [value * -1 for value in vix_trend]
 
-  dates = df.index[1:]
-  print(f'length of lists:')
-  print(len(dates))
-  print(len(vix_trend))
-  print(len(ticker_trend))
-  print(f'yes: {yes}')
-  print(f'no: {no}')
-  print(f'sum of yes & no: {yes + no}')
-  print(f'yes percentage: {round(yes / len(vix_trend) * 100, 2)}%')
-
+  dates = vix.index[1:]
   plt.plot(dates, vix_trend, label='VIX')
-  plt.plot(dates, ticker_trend, label='VTSAX')
+  plt.plot(dates, ticker_trend, label='VFIAX')
   plt.axhline(0, color='black')
-
-  # x_day = []
-  # day = 0
-  # for date in range(len(dates)):
-  #   x_day.append(day)
-  #   day = day + 1
-  # # x_day.pop(0)
-  # print(x_day)
-  # vix_deriv = diff(vix_trend)/diff(x_day)
-  # ticker_deriv = diff(ticker_trend)/diff(x_day)
-  # new_dates = dates[1:]
-  # plt.plot(new_dates, vix_deriv, label='vix_deriv')
-  # plt.plot(new_dates, ticker_deriv, label='ticker_deriv')
-
   if use_inverse == True:
-      plt.title('VIX (inverse) vs VTSAX performance')
+      plt.title('VIX (inverse) vs VFIAX performance')
   else:
-    plt.title('VIX vs VTSAX performance')
+    plt.title('VIX vs VFIAX performance')
 
 
   plt.xlabel('Date')
   plt.ylabel('% Gain / Loss From Previous Day')
   plt.legend(loc="upper right")
   plt.show()
-
-
-
-  # ticker['Close'].plot(label = 'VTSAX')
-
-
-  # vix['Date'] = pandas.to_datetime(vix['Date'], format = '%Y-%m-%d')
-  # vix.set_index(['Date'], inplace=True)
-  # df['^VIX']['Close'].plot(label='VIX')
-
-  # prev = -1
-  # diff = -1
-  # for close in vix:
-  #   # set up first values
-  #   if prev == -1:
-  #     prev = close
-  #     continue
-  #   gain_loss = close - prev
-  #   prev = close
-  #   print(gain_loss / close * 100)

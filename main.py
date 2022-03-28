@@ -2,9 +2,9 @@ import analysis as analysis
 def main():
 
   actions = {
-    '1' : 'View Pre-COVID history of VIX & VFIAX',
-    '2' : 'View Post-COVID gain/loss of VIX & VFIAX',
-    '3' : 'View Post-COVID gain/loss of VIX (inverse) & VFIAX',
+    '1' : 'View historical closing values of VIX & VFIAX',
+    '2' : 'View recent gain/loss of VIX & VFIAX',
+    '3' : 'View recent gain/loss of VIX (inverse) & VFIAX',
     '4' : 'Exit Program',
   }
   
@@ -17,9 +17,9 @@ def main():
       if selection == '1':
         analysis.show_historical()
       elif selection == '2':
-        analysis.show_recent(use_inverse = False)
+        analysis.show_recent(use_inverse = False, show_analysis=True)
       elif selection == '3':
-        analysis.show_recent(use_inverse = True)
+        analysis.show_recent(use_inverse = True, show_analysis=False)
       else: break 
     else:
       print('Invalid Selection!')
