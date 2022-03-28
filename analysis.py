@@ -6,6 +6,8 @@ import pandas as pandas
 import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
+import colorama
+from colorama import Fore
 
 def convert_values_to_float(ticker_close_list):
   return [float(value) for value in ticker_close_list]
@@ -50,20 +52,76 @@ def show_historical():
   print(filtered_vix)
 
   # plot data with matplotlib                            
-  filtered_vix['Close'].plot(label = '^VIX (Market Volatility)')
+  filtered_vix['Close'].plot(label = 'VIX (Market Volatility)')
   filtered_ticker['Close'].plot(label = TICKER_FILE_NAME.strip('.csv'))
   plt.title(f'Historical Trends, Pre-COVID\nFrom {common_start_date} to {LAST_PRECOVID_DATE}')
   plt.xlabel('Date')
   plt.ylabel('Index')
   plt.legend(loc="upper right")
-
   plt.show()
-
   show_gain_loss(filtered_vix, filtered_ticker, ticker_name)
 
 
-  # data visualizations: https://www.analyticsvidhya.com/blog/2021/07/stock-prices-analysis-with-python/
-  # Check out dataframe.corr() method for correlations
+def analyze_correlation(vix_trend, ticker_trend, ticker_name, dates):
+  yes = 0
+  no = 0
+
+  message = ''
+  output_dates = []
+  output_vix = []
+  output_ticker = []
+  output_inverse_correlation = []
+
+  for i, date in enumerate(dates):
+    vix_val = f'{(round(vix_trend[i],3))}%'
+    ticker_val = f'{(round(ticker_trend[i],3))}%'
+    
+    if vix_trend[i] > 0:
+      vix_val = '+' + vix_val
+    if ticker_trend[i] > 0:
+      ticker_val = '+' + ticker_val
+
+    # add to output data
+    output_dates.append(f'{date.date()}')
+    output_vix.append(f'{vix_val}')
+    output_ticker.append(f'{ticker_val}')
+
+    # print to console a message for each day  
+    vix_val = (vix_val + ' ').ljust(10)
+    ticker_val = (ticker_val + ' ').ljust(10)
+    message = f'Date: {date.date()}   VIX: {vix_val} {ticker_name}: {ticker_val}'
+    if (np.sign(vix_trend[i]) != np.sign(ticker_trend[i])):
+      yes += 1
+      output_inverse_correlation.append('yes')
+      print(Fore.GREEN, message, Fore.RESET)
+    else:
+      no += 1
+      output_inverse_correlation.append('no')
+      print(Fore.RED, message,  Fore.RESET)
+    
+  output_data = {
+    'Date': output_dates,
+    'VIX': output_vix,
+    f'{ticker_name}': output_ticker,
+    'Inverse_Correlated?': output_inverse_correlation
+  }
+  output_df = pandas.DataFrame(output_data, columns=['Date', 'VIX', ticker_name, 'Inverse_Correlated?'])
+  output_df.to_csv ('output/historical_gain_loss.csv', index = False, header=True)
+
+  print(f'\n^Previous Day Gain/Loss % of VIX & {ticker_name}')
+  print(f'\n{len(dates)} days analyzed...')
+  print(f'Found {yes} days where VIX and {ticker_name} were opposite signs...')
+  print(f'Inverse correlation percentage: {round(yes / len(vix_trend) * 100, 2)}%')
+
+# used for saving results to dictionary
+# def correlation_dict(vix_trend, ticker_trend, ticker_name, dates):
+#   result = {}
+#   for i, date in enumerate(dates):
+#     result[date.strftime('%m/%d/%Y')] = {
+#       '^VIX': vix_trend[i],
+#       ticker_name: ticker_trend[i]
+#     }
+#   print(result)
 
 def show_gain_loss(vix, ticker, ticker_name):
   dates = vix.index[1:]
@@ -72,40 +130,12 @@ def show_gain_loss(vix, ticker, ticker_name):
   ticker_close = convert_values_to_float(ticker['Close'].to_list())
   ticker_trend = calculate_gain_loss(ticker_close)
 
-  yes = 0
-  no = 0
-  for vix,ticker in zip(vix_trend, ticker_trend):
-    if (np.sign(vix) != np.sign(ticker)):
-      yes += 1
-      print(vix, ticker, 'yes')
-    else:
-      no += 1
-      print(vix, ticker, 'no')
-
-
-
-  # result = {}
-  # # save analysis in a result dict
-  # for i, date in enumerate(dates):
-  #   result[date.strftime('%m/%d/%Y')] = {
-  #     '^VIX': vix_trend[i],
-  #     ticker_name: ticker_trend[i]
-  #   }
-  # print(result)
-
-  print(f'length of lists:')
-  print(len(dates))
-  print(len(vix_trend))
-  print(len(ticker_trend))
-  print(f'yes: {yes}')
-  print(f'no: {no}')
-  print(f'sum of yes & no: {yes + no}')
-  print(f'yes percentage: {round(yes / len(vix_trend) * 100, 2)}%')
+  analyze_correlation(vix_trend, ticker_trend, ticker_name, dates)
 
   # plt.plot(dates, vix_trend, label='VIX')
   # plt.plot(dates, ticker_trend, label='Ticker')
   # plt.axhline(0, color='black')
-  # plt.title('VIX vs VTSAX performance')
+  # plt.title(f'Daily Performance of VIX vs {ticker_name}')
   # plt.xlabel('Date')
   # plt.ylabel('% Gain / Loss From Previous Day')
   # plt.legend(loc="upper right")
@@ -115,18 +145,18 @@ def show_gain_loss(vix, ticker, ticker_name):
 def show_recent(use_inverse):
   # plots percentage gain and loss
 
-  # vtsax = yf.Ticker('VTSAX')
+  # ticker = yf.Ticker('VTSAX')
   # vix = yf.Ticker('^VIX')
 
   symbols = ['^VIX', 'VTSAX']
   tickers = yf.Tickers(symbols)
-  df = tickers.download(group_by='ticker', start='2020-01-01')
+  df = tickers.download(group_by='ticker', start='2022-01-01')
 
   vix = df['^VIX']
   vix_close = vix['Close'].to_list()
 
-  vtsax = df['VTSAX']
-  vtsax_close = vtsax['Close'].to_list()
+  ticker = df['VTSAX']
+  ticker_close = ticker['Close'].to_list()
 
   vix_close = convert_values_to_float(vix_close)
   vix_trend = calculate_gain_loss(vix_close)
@@ -146,14 +176,14 @@ def show_recent(use_inverse):
   #   else:
   #     vix_trend.append(gl_percent)
 
-  ticker_trend = calculate_gain_loss(vtsax_close)
+  ticker_trend = calculate_gain_loss(ticker_close)
 
   yes = 0
   no = 0
   for vix,ticker in zip(vix_trend, ticker_trend):
     if (np.sign(vix) != np.sign(ticker)):
       yes += 1
-      print(vix, ticker, 'yes')
+      print(f'vix: {vix}', ticker, 'yes')
     else:
       no += 1
       print(vix, ticker, 'no')
@@ -180,10 +210,10 @@ def show_recent(use_inverse):
   # # x_day.pop(0)
   # print(x_day)
   # vix_deriv = diff(vix_trend)/diff(x_day)
-  # vtsax_deriv = diff(vtsax_trend)/diff(x_day)
+  # ticker_deriv = diff(ticker_trend)/diff(x_day)
   # new_dates = dates[1:]
   # plt.plot(new_dates, vix_deriv, label='vix_deriv')
-  # plt.plot(new_dates, vtsax_deriv, label='vtsax_deriv')
+  # plt.plot(new_dates, ticker_deriv, label='ticker_deriv')
 
   if use_inverse == True:
       plt.title('VIX (inverse) vs VTSAX performance')
@@ -198,7 +228,7 @@ def show_recent(use_inverse):
 
 
 
-  # vtsax['Close'].plot(label = 'VTSAX')
+  # ticker['Close'].plot(label = 'VTSAX')
 
 
   # vix['Date'] = pandas.to_datetime(vix['Date'], format = '%Y-%m-%d')
