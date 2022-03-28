@@ -1,7 +1,7 @@
 # VIX Analysis
 
 Question explored:
-  How well does VIX (market volatility index) predict total stock index performance the next day?
+  What is the correlation of VIX (market violatility index) to the closing price of an market index fund, such as VFIAX? 
 
 Requirement features:
   - [x] Category 1: Python Programming Basics: 
