@@ -1,9 +1,15 @@
 # VIX Analysis
 
-Question explored:
+## Question explored:
   What is the correlation of VIX (market violatility index) to the closing price of an market index fund, such as VFIAX? 
 
-Requirement features:
+## Description:
+
+## Packages used:
+
+## How to run:
+
+## Requirement features:
   - [x] Category 1: Python Programming Basics: 
     - Create a dictionary or list, populate it with several values, retrieve at least one value, and use it in your program.
   - [x] Category 2: Utilize External Data:
