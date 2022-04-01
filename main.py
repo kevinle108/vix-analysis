@@ -1,17 +1,16 @@
 import analysis as analysis
 def main():
-
   actions = {
-    '1' : 'View historical closing values of VIX & VFIAX',
-    '2' : 'View recent gain/loss of VIX & VFIAX',
-    '3' : 'View recent gain/loss of VIX (inverse) & VFIAX',
+    '1' : 'View & analyze historical closing values of VIX & VFIAX',
+    '2' : 'View & analyze YTD gain/loss of VIX & VFIAX',
+    '3' : 'View YTD gain/loss of VIX (inverse) & VFIAX',
     '4' : 'Exit Program',
   }
   
   while True:
     print('\nVIX Analysis Menu:\n')
     for keypress, description in actions.items():
-      print(f'\t[{keypress}] - {description}')
+      print(f'[{keypress}] - {description}')
     selection = input("""\nSelect an option:  """)
     if selection in actions:
       if selection == '1':
