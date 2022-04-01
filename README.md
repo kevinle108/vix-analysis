@@ -13,7 +13,7 @@ The CBOE Volatility Index (VIX) is often used as a measurement of stock market f
 - Finally, run `python main.py` to start the console app.
 
 ## Notes: 
-- Because there was too many data points when visualizing the historical growth of VIX vs VFIAX, I added visualizations for just this year. The smaller data set helps show the inverse correlation nature of VIX and VFIAX. And to see this even more clearly, there is a visualization of VIX-inverse vs VFIAX.
+- Because there were too many data points when visualizing the historical growth of VIX vs VFIAX, I added visualizations for just this year (YTD). This smaller data set better visualizes the inverse correlation nature of VIX and VFIAX. And to see this relation even more clearly, there is a visualization of VIX-inverse vs VFIAX.
 
 ## Data Sources Used:
 Downloaded from Yahoo Finance, the csv files `./data/historical/^VIX.csv` and `./data/historical/VFIAX.csv` were used to analyze the historical correlation of VIX and VFIAX . For the recent YTD visualizations, the program calls the Yahoo Finance API to collect this year's VIX and VFIAX data.
