@@ -103,7 +103,7 @@ def analyze_correlation(vix_trend, ticker_trend, ticker_name, dates):
     'Inverse_Correlated?': output_inverse_correlation
   }
   output_df = pandas.DataFrame(output_data, columns=['Date', 'VIX', ticker_name, 'Inverse_Correlated?'])
-  output_df.to_csv ('output/gain_loss.csv', index = False, header=True)
+  output_df.to_csv ('output_daily_gain_loss.csv', index = False, header=True)
 
   print(f'\n^Previous Day Gain/Loss % of VIX & {ticker_name}')
   print(f'\n{len(dates)} days analyzed...')
